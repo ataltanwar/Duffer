@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* Custom theme overrides */
+@theme {
+  --color-brand: #6366f1;
+  --color-brand-light: #818cf8;
+  --color-surface: #111111;
+  --color-surface-light: #1a1a1a;
+  --color-border: #2a2a2a;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+/* Bottom sheet slide up */
+.animate-slide-up {
+  animation: slide-up 250ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown menu fade-scale */
+.animate-menu {
+  animation: menu-pop 180ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  transform-origin: top right;
+}
+@keyframes menu-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Quick reaction bar centered pop */
+.animate-pop {
+  animation: pop-bounce 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes pop-bounce {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.75) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+/* Confirm modal */
+.animate-confirm {
+  animation: confirm-in 180ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+@keyframes confirm-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* In-app notification */
+.animate-notify {
+  animation: notify-in 180ms ease-out forwards;
+}
+@keyframes notify-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+

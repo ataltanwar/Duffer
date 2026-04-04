@@ -1,4 +1,4 @@
-# Duffer <img width="512" height="512" alt="Mascot Flat Transparent" src="https://github.com/user-attachments/assets/e019dffe-6dc7-49bc-9e5b-716270810cd4" />
+<img width="884" height="282" alt="Header Icon" src="https://github.com/user-attachments/assets/1f93e37e-0f91-40e2-b7b8-3c43ef47d946" />
 
 > A competitive anonymous social network where content wins, not popularity.
 

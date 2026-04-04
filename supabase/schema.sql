@@ -145,12 +145,49 @@ create policy "Owner or admin can delete comment"
     or exists (select 1 from public.users where id = auth.uid() and is_admin = true)
   );
 
+-- 5. Messages table (global chat)
+create table public.messages (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references public.users(id) on delete cascade not null,
+  content text not null check (char_length(content) <= 500),
+  created_at timestamptz default now()
+);
+
+create index idx_messages_created_at on public.messages (created_at desc);
+
+-- Messages policies
+alter table public.messages enable row level security;
+
+create policy "Anyone can read messages"
+  on public.messages for select
+  to authenticated
+  using (true);
+
+create policy "Non-banned users can send messages"
+  on public.messages for insert
+  to authenticated
+  with check (
+    auth.uid() = user_id
+    and not exists (
+      select 1 from public.users where id = auth.uid() and is_banned = true
+    )
+  );
+
+create policy "Owner or admin can delete message"
+  on public.messages for delete
+  to authenticated
+  using (
+    auth.uid() = user_id
+    or exists (select 1 from public.users where id = auth.uid() and is_admin = true)
+  );
+
 -- ============================================
 -- Enable Realtime
 -- ============================================
 alter publication supabase_realtime add table public.posts;
 alter publication supabase_realtime add table public.reactions;
 alter publication supabase_realtime add table public.comments;
+alter publication supabase_realtime add table public.messages;
 
 -- ============================================
 -- Make yourself admin (run after first login)

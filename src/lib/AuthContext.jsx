@@ -21,6 +21,10 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
+        // Clean up hash fragment left by OAuth redirect
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname || '/home');
+        }
         if (session) await fetchOrCreateProfile(session.user);
         else {
           setProfile(null);

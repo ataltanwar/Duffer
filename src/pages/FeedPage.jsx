@@ -30,7 +30,7 @@ export default function FeedPage() {
         id, content, created_at, user_id,
         users!posts_user_id_fkey ( anon_username ),
         reactions ( id, emoji, user_id ),
-        comments ( id )
+        comments ( count )
       `)
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);
@@ -42,7 +42,7 @@ export default function FeedPage() {
 
     const postsWithCounts = (data || []).map((p) => ({
       ...p,
-      comment_count: (p.comments || []).length,
+      comment_count: p.comments?.[0]?.count ?? 0,
     }));
 
     setPosts(postsWithCounts);
@@ -64,7 +64,7 @@ export default function FeedPage() {
         id, content, created_at, user_id,
         users!posts_user_id_fkey ( anon_username ),
         reactions ( id, emoji, user_id ),
-        comments ( id )
+        comments ( count )
       `)
       .order('created_at', { ascending: false })
       .lt('created_at', oldest)
@@ -78,7 +78,7 @@ export default function FeedPage() {
 
     const more = (data || []).map((p) => ({
       ...p,
-      comment_count: (p.comments || []).length,
+      comment_count: p.comments?.[0]?.count ?? 0,
     }));
 
     setPosts((prev) => {
@@ -169,15 +169,8 @@ export default function FeedPage() {
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id !== postId) return p;
-        let comments = p.comments || [];
-        if (eventType === 'INSERT') {
-          if (!comments.some((c) => c.id === record.id)) {
-            comments = [...comments, { id: record.id }];
-          }
-        } else if (eventType === 'DELETE') {
-          comments = comments.filter((c) => c.id !== payload.old.id);
-        }
-        return { ...p, comments, comment_count: comments.length };
+        const delta = eventType === 'INSERT' ? 1 : eventType === 'DELETE' ? -1 : 0;
+        return { ...p, comment_count: Math.max(0, (p.comment_count ?? 0) + delta) };
       })
     );
   }, []);
@@ -317,7 +310,20 @@ export default function FeedPage() {
         <CreatePost onPosted={handlePostCreated} />
 
         {loading ? (
-          <div className="text-center py-12 text-zinc-500">Loading feed...</div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-surface rounded-2xl p-5 border border-border animate-pulse">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-4 w-24 bg-zinc-800 rounded" />
+                  <div className="h-3 w-12 bg-zinc-800 rounded" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-full bg-zinc-800 rounded" />
+                  <div className="h-3 w-3/4 bg-zinc-800 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-12 text-zinc-500">
             No posts yet. Be the first to say something.

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
+import { MessageCircle } from 'lucide-react';
 
 export default function Header() {
   const { profile, signOut, isAdmin, updateUsername } = useAuth();
@@ -32,13 +33,27 @@ export default function Header() {
     if (e.key === 'Escape') setEditing(false);
   }
 
+  const location = useLocation();
+  const onChat = location.pathname === '/chat';
+
   return (
     <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-border">
       <div className="max-w-xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link to="/">
+        <Link to="/home">
           <img src="/dufferlogo.svg" alt="Duffer" className="h-9" />
         </Link>
         <div className="flex items-center gap-3">
+          <Link
+            to={onChat ? '/home' : '/chat'}
+            className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-colors ${
+              onChat
+                ? 'bg-brand/20 text-brand-light hover:bg-brand/30'
+                : 'bg-surface-light text-zinc-400 hover:text-zinc-200 border border-border hover:border-zinc-500'
+            }`}
+          >
+            <MessageCircle size={14} />
+            {onChat ? 'Feed' : 'Chat'}
+          </Link>
           {isAdmin && (
             <Link
               to="/admin"

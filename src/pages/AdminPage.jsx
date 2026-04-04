@@ -16,7 +16,7 @@ export default function AdminPage() {
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate('/', { replace: true });
+    if (!loading && !isAdmin) navigate('/home', { replace: true });
   }, [loading, isAdmin, navigate]);
 
   useEffect(() => {

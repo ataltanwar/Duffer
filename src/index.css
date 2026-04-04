@@ -97,3 +97,27 @@
   }
 }
 
+/* Chat message slide in */
+.animate-msg-in {
+  animation: msg-in 150ms ease-out forwards;
+}
+@keyframes msg-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in (scroll-to-bottom button) */
+.animate-fade-in {
+  animation: fade-in 150ms ease-out forwards;
+}
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+

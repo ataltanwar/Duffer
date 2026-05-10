@@ -1,5 +1,6 @@
 <img width="884" height="282" alt="Header Icon" src="https://github.com/user-attachments/assets/1f93e37e-0f91-40e2-b7b8-3c43ef47d946" />
 
+
 > A competitive anonymous social network where content wins, not popularity.
 
 Anonymous social feed built with **React + Vite + TailwindCSS + Supabase**.

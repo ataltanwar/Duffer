@@ -10,11 +10,24 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Failsafe: never load for more than 5 seconds
+    const fallbackTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Session error:', error);
+        setLoading(false);
+        return;
+      }
+      clearTimeout(fallbackTimeout);
       setSession(session);
       if (session) fetchOrCreateProfile(session.user);
       else setLoading(false);
+    }).catch((err) => {
+      console.error('Unexpected session error:', err);
+      setLoading(false);
     });
 
     // Listen for auth changes
@@ -33,7 +46,10 @@ export function AuthProvider({ children }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(fallbackTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function fetchOrCreateProfile(user) {

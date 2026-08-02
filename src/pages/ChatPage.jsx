@@ -40,7 +40,7 @@ export default function ChatPage() {
   const fetchMessages = useCallback(async () => {
     const { data, error } = await supabase
       .from('messages')
-      .select('id, content, created_at, user_id, users!messages_user_id_fkey ( anon_username )')
+      .select('id, content, created_at, user_id, users ( anon_username )')
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);
 
@@ -68,7 +68,7 @@ export default function ChatPage() {
 
     const { data, error } = await supabase
       .from('messages')
-      .select('id, content, created_at, user_id, users!messages_user_id_fkey ( anon_username )')
+      .select('id, content, created_at, user_id, users ( anon_username )')
       .order('created_at', { ascending: false })
       .lt('created_at', oldest)
       .limit(PAGE_SIZE);

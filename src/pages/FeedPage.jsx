@@ -14,6 +14,14 @@ export default function FeedPage() {
   const { profile } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Failsafe timeout: stop skeleton loader after 2 seconds no matter what
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const channelRef = useRef(null);
@@ -24,30 +32,36 @@ export default function FeedPage() {
 
   // ── Fetch only required fields, limited to PAGE_SIZE ──
   const fetchPosts = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('posts')
-      .select(`
-        id, content, created_at, user_id,
-        users!posts_user_id_fkey ( anon_username ),
-        reactions ( id, emoji, user_id ),
-        comments ( count )
-      `)
-      .order('created_at', { ascending: false })
-      .limit(PAGE_SIZE);
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          id, content, created_at, user_id,
+          users ( anon_username ),
+          reactions ( id, emoji, user_id ),
+          comments ( count )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(PAGE_SIZE);
 
-    if (error) {
-      console.error('Fetch posts error:', error);
-      return;
+      if (error) {
+        console.error('Fetch posts error:', error);
+        setLoading(false);
+        return;
+      }
+
+      const postsWithCounts = (data || []).map((p) => ({
+        ...p,
+        comment_count: p.comments?.[0]?.count ?? 0,
+      }));
+
+      setPosts(postsWithCounts);
+      setHasMore((data || []).length === PAGE_SIZE);
+    } catch (err) {
+      console.error('Fetch posts exception:', err);
+    } finally {
+      setLoading(false);
     }
-
-    const postsWithCounts = (data || []).map((p) => ({
-      ...p,
-      comment_count: p.comments?.[0]?.count ?? 0,
-    }));
-
-    setPosts(postsWithCounts);
-    setHasMore((data || []).length === PAGE_SIZE);
-    setLoading(false);
   }, []);
 
   // ── Load more (infinite scroll) ──
